@@ -1,20 +1,8 @@
 # Testing
 
-## Running
+Tests reside in `tests/test_gcp_billing_analyzer.py` and are executed via `pytest`.
 
-```sh
-uv run pytest --cov=gcp_billing_analyzer   # tests with coverage report
-uv run python scripts/check.py      # every gate, as CI and the factory run it
-```
-
-## Policy
-
-- Branch coverage of `src/gcp_billing_analyzer` must stay at or above 80 %; the gate fails below it.
-- Tests exercise the public API (`import gcp_billing_analyzer`) and assert every observable effect:
-  return values, raised exceptions and their messages.
-- Each bug fix starts with a failing test that reproduces it.
-- Tests are deterministic: no network, no wall clock, no dependence on test order.
-
-## Layout
-
-`tests/test_<module>.py` mirrors each public module. Shared fixtures go in `tests/conftest.py`.
+### Coverage
+- **Acceptance Tests**: Verifies core calculations, label/project/sku grouping logic, credit aggregation, and month filtering.
+- **Error Handling**: Validates that bad JSON, missing fields, invalid values, currency mismatches, and invalid `by` parameters raise the correct `BillingError` codes.
+- **Boundaries**: Ensures inputs exceeding size limits or row counts correctly trigger `input_too_large` errors.

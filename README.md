@@ -1,48 +1,45 @@
 # gcp-billing-analyzer
 
-[![PyPI version](https://img.shields.io/pypi/v/trysac-gcp-billing-analyzer)](https://pypi.org/project/trysac-gcp-billing-analyzer/)
-[![License: MIT](https://img.shields.io/pypi/l/trysac-gcp-billing-analyzer)](LICENSE)
-[![CI](https://github.com/Trysac/u182-gcp-billing-analyzer/actions/workflows/ci.yml/badge.svg)](https://github.com/Trysac/u182-gcp-billing-analyzer/actions/workflows/ci.yml)
+Analyze Google Cloud Billing detailed BigQuery exports with exact Decimal arithmetic. This utility prevents floating-point drift common in spreadsheet software and preserves nested credit structures (e.g., CUDs, Free Tier) lost in flattened CSV exports.
 
-Analyze Google Cloud billing exports in newline-delimited JSON: gross, credits and net cost by project, service, SKU, region or label with exact Decimal sums
+## Installation
 
-## Problem
-
-Describe in two or three sentences the concrete problem this utility solves, who hits it, and what
-they do today without it. Replace this paragraph when the first real feature lands.
-
-## Install
-
-```sh
-pip install trysac-gcp-billing-analyzer
-# or
-uv add trysac-gcp-billing-analyzer
+```bash
+pip install gcp-billing-analyzer
 ```
-
-Requires Python 3.10 or newer. No runtime dependencies.
 
 ## Usage
 
 ```python
-import gcp_billing_analyzer
+from gcp_billing_analyzer import load_ndjson, summarize, render
 
-# normalize() trims surrounding whitespace and lower-cases the text.
-print(gcp_billing_analyzer.normalize("  Hello World "))  # -> "hello world"
+with open("export.json", encoding="utf-8") as f:
+    rows = load_ndjson(f.read())
 
-# Blank input is rejected explicitly instead of returning an empty string.
-try:
-    gcp_billing_analyzer.normalize("   ")
-except ValueError as exc:
-    print(f"rejected: {exc}")
+lines = summarize(rows, by="project", month="202610")
+print(render(lines, "text"))
 ```
 
-## Documentation
+## API Summary
 
-- [Architecture](docs/ARCHITECTURE.md) and [decisions](docs/decisions/)
-- [Testing](docs/TESTING.md) and [security](docs/SECURITY.md)
-- [Project record](docs/PROJECT.md) and [stack](docs/STACK.md)
-- [Changelog](CHANGELOG.md) and [contributing guide](CONTRIBUTING.md)
+- `load_ndjson(text: str, *, max_bytes: int = 100_000_000, max_rows: int = 2_000_000) -> list[BillingRow]`
+- `summarize(rows: Sequence[BillingRow], *, by: str, month: str | None = None, cost_types: Sequence[str] | None = None) -> list[Line]`
+- `credits_by_type(rows: Sequence[BillingRow], *, month: str | None = None) -> dict[str, Decimal]`
+- `render(lines: Sequence[Line], fmt: Literal["csv", "text"]) -> str`
 
-## License
+### Errors
 
-[MIT](LICENSE) (c) 2026 Miguel Gomez
+All public functions may raise `BillingError(code, message)` with codes: `input_too_large`, `invalid_json`, `missing_field`, `invalid_value`, `currency_mismatch`, `invalid_option`.
+
+### Options
+
+- `by`: "project", "service", "sku", "region", or "label:<key>"
+- `fmt`: "csv" or "text"
+
+## Why not alternative tools?
+
+Spreadsheet tools drift with floating-point arithmetic and flattened CSV exports drop nested credit arrays. This utility computes sums using the `decimal` module for exact precision and parses the full NDJSON structure.
+
+## Security
+
+See [docs/SECURITY.md](docs/SECURITY.md) for the threat model and limits.

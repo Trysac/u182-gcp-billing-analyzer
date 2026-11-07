@@ -19,6 +19,9 @@ classifiers = [
 ]
 dependencies = []
 
+[project.scripts]
+gcp-billing-analyzer = "gcp_billing_analyzer.__main__:main"
+
 [project.urls]
 Homepage = "https://github.com/Trysac/u182-gcp-billing-analyzer"
 Source = "https://github.com/Trysac/u182-gcp-billing-analyzer"

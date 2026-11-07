@@ -1,29 +1,13 @@
 # Architecture
 
-## Purpose
+## Components
 
-`trysac-gcp-billing-analyzer` is a small, dependency-free Python library: Analyze Google Cloud billing exports in newline-delimited JSON: gross, credits and net cost by project, service, SKU, region or label with exact Decimal sums
+1. **Data Model**: Uses frozen `dataclasses` (`BillingRow`, `Credit`, `Line`) to ensure immutability during analysis.
+2. **Parsing**: Streaming NDJSON parser using `json.loads` with custom `parse_float` and `parse_int` hooks set to `Decimal`.
+3. **Analysis Engine**: A grouping and aggregation layer that computes totals using exact `Decimal` arithmetic.
+4. **Renderer**: Transforms `Line` objects into display-ready strings (CSV or tabular text).
 
-## Shape
-
-```text
-caller code --> gcp_billing_analyzer (public API in __init__.py)
-                    |
-                    +-- pure functions, no I/O, no global state
-```
-
-- **Public API**: the names listed in `__all__` of `src/gcp_billing_analyzer/__init__.py`. Anything else is
-  internal and may change without a major version.
-- **Errors**: invalid input raises built-in exceptions (`ValueError`, `TypeError`) with a clear
-  message; the library never prints or exits.
-- **Side effects**: none. If a feature needs I/O, isolate it in its own module behind a small
-  interface and record the choice in an ADR.
-
-## Quality contract
-
-`scripts/check.py` is the single definition of the gates; `fabrica.json` tells the factory and CI
-how to run it. See [TESTING.md](TESTING.md).
-
-## Decisions
-
-Architecture decisions are recorded in [decisions/](decisions/) as numbered ADRs.
+## Data Flow
+1. Input String -> `load_ndjson` -> `list[BillingRow]`
+2. `list[BillingRow]` -> `summarize` or `credits_by_type` -> `list[Line]` or `dict[str, Decimal]`
+3. Summaries -> `render` -> String Output

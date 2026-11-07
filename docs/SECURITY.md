@@ -1,19 +1,11 @@
-# Security notes
+# Security
 
-## Threat model
+## Threat Model
 
-`trysac-gcp-billing-analyzer` is a pure library without I/O. The main risks are:
+### Defended
+- **Unbounded Input (DoS)**: `load_ndjson` enforces a strict 100MB input limit and 2,000,000 row limit. Error messages truncate input to 200 characters to protect log storage.
+- **Floating Point Exploits**: Uses `Decimal` for all arithmetic. Rejects non-finite numbers (`NaN`, `Infinity`) via the `parse_constant` callback.
+- **Confidentiality**: The library does not log input data. It uses a `NullHandler` for its logger to prevent accidental data leakage.
 
-- **Supply chain**: a compromised dependency or CI action. Mitigation: no runtime dependencies,
-  Dependabot weekly updates, actions pinned to major versions, minimal workflow permissions.
-- **Leaked secrets**: tokens committed by mistake. Mitigation: `gitleaks` runs in the local gates
-  and in CI; `.env` files are git-ignored.
-- **Untrusted input**: callers may pass hostile strings. Mitigation: validate input and fail with
-  explicit exceptions; never `eval`, `exec` or deserialize untrusted data.
-
-## Publishing
-
-Releases are published to PyPI with trusted publishing (OIDC) when available, never with a
-long-lived token stored in the repository.
-
-To report a vulnerability, see [SECURITY.md](../SECURITY.md).
+### Not Defended
+- **Input Source Integrity**: Does not verify the source or integrity of the billing JSON file.
