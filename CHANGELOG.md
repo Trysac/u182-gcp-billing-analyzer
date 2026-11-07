@@ -9,4 +9,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Add gcp-billing-analyzer with Decimal precision NDJSON parsing, dimensional summarization, credit breakdown, and CLI tool.
 - Initial project structure from the factory utility template.

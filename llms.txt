@@ -1,16 +1,10 @@
 # gcp-billing-analyzer
 
-> Analyze Google Cloud billing exports in newline-delimited JSON: gross, credits and net cost by project, service, SKU, region or label with exact Decimal sums Python package `trysac-gcp-billing-analyzer`, import name `gcp_billing_analyzer`, MIT licensed,
-> Python >= 3.10, no runtime dependencies.
+Analyze Google Cloud Billing detailed exports in newline-delimited JSON with exact Decimal arithmetic.
 
 ## Docs
 
-- [README](README.md): problem, install, usage example
-- [AGENTS](AGENTS.md): commands, folder map, conventions, limits
-- [Architecture](docs/ARCHITECTURE.md): shape of the package and its public API
-- [Testing](docs/TESTING.md): how to run and extend the tests
-
-## Optional
-
-- [Stack](docs/STACK.md): tools used and discarded
-- [Changelog](CHANGELOG.md): release history
+- [README](README.md): Installation, usage, and API summary.
+- [Architecture](docs/ARCHITECTURE.md): Data flow and component design.
+- [Security](docs/SECURITY.md): Threat model and limits.
+- [Testing](docs/TESTING.md): Test suite details.
