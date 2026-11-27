@@ -4,8 +4,10 @@ Analyze Google Cloud Billing detailed BigQuery exports with exact Decimal arithm
 
 ## Installation
 
+Not published to PyPI yet. Install it from GitHub:
+
 ```bash
-pip install gcp-billing-analyzer
+pip install "git+https://github.com/Trysac/u182-gcp-billing-analyzer"
 ```
 
 ## Usage
